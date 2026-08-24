@@ -77,6 +77,35 @@ Recent:
   destinations (`dest[...]`), and pending stops (`up[...]` / `down[...]`).
 - `Recent:` shows the last few events.
 
+## Run in a container
+
+A multi-stage `Dockerfile` at the repository root builds and publishes the
+console app on top of the .NET 8 runtime image.
+
+Build the image from the solution root:
+
+```bash
+docker build -t elevatorcontrol .
+```
+
+Run it. Use `-it` so the live dashboard (which redraws the screen each tick)
+renders correctly and so `Ctrl+C` stops it:
+
+```bash
+docker run --rm -it elevatorcontrol
+```
+
+The same optional arguments are passed straight through after the image name:
+
+```bash
+# 30s of traffic, half speed, reproducible (seed 42)
+docker run --rm -it elevatorcontrol 30 500 42
+```
+
+Without a TTY (for example in CI, or `docker run` without `-t`) the app detects
+that output is redirected and prints each frame on a new line instead of
+clearing the screen, so it still works when captured to logs.
+
 ## Configuration
 
 The building and timing are set in `SimulationConfig` (in the `Domain` project).
@@ -120,6 +149,8 @@ A layered solution; each layer only depends on the ones beneath it.
 
 ```
 ElevatorControl.sln
+├─ Dockerfile                                container build (publishes the console app)
+├─ .dockerignore
 ├─ BusinessLayer/
 │  ├─ ElevatorControl.Domain              types only (no dependencies)
 │  ├─ ElevatorControl.Services.Interfaces service contracts (-> Domain)

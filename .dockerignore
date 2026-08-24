@@ -1,0 +1,7 @@
+# Build output and IDE/local files - not needed in the image
+**/bin/
+**/obj/
+**/.vs/
+**/*.user
+.git/
+_to_delete/
